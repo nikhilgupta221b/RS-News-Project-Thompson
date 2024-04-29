@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>News Recommender</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/homepage.css') }}">
+</head>
+<body>
+    <h1>News Recommender</h1>
+    <form method="POST">
+        <input type="text" name="user_id" placeholder="Enter User ID">
+        <button type="submit">Get Recommendations</button>
+    </form>
+</body>
+</html>

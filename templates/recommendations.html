@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>News Recommendations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/recommendation.css') }}">
+</head>
+<body>
+    <h1>Recommendations for User {{ user_id }}</h1>
+    <div id="most-viewed-categories" class="compact-list">
+        <h2>Most Viewed Categories</h2>
+        <ul>
+            {% for category in categories %}
+                <li>{{ category[0] }}: {{ category[1] }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div id="recommendations">
+        {% for article in articles %}
+            <article>
+    <div class="article-content"> <h2>{{ article['Title'] }}</h2>
+        <p class="category">{{ article['Category'] }}</p>
+    </div>
+    <button class="like-button" data-article-id="{{ article['News ID'] }}">Like</button>
+</article>
+
+        {% endfor %}
+    </div>
+    <button onclick="getNewRecommendations('{{ user_id }}')">Get New Recommendations</button>
+<script>
+    function bindLikeButtons() {
+    const likeButtons = document.querySelectorAll('.like-button');
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const articleId = this.getAttribute('data-article-id');
+            const userId = '{{ user_id }}'; // Accessing user_id directly since the script is inline
+            fetch('/update_preferences', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user_id: userId, article_id: articleId, liked: true })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    this.innerHTML = 'Liked'; // Change button text
+                    this.classList.add('liked-button'); // Change button style
+                    this.disabled = true; // Disable the button
+                } else {
+                    alert('Error liking the article.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    bindLikeButtons(); // Bind event listeners on initial page load
+});
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const likeButtons = document.querySelectorAll('.like-button');
+        likeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const articleId = this.getAttribute('data-article-id');
+                const userId = '{{ user_id }}'; // Accessing user_id directly since the script is inline
+                const button = this; // Store reference to the button
+                fetch('/update_preferences', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user_id: userId, article_id: articleId, liked: true })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        button.innerHTML = 'Liked'; // Change button text
+                        thisButton.classList.add('liked-button');
+                        button.disabled = true; // Disable the button
+                    } else {
+                        alert('Error liking the article.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+
+function getNewRecommendations(userId) {
+    fetch('/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `user_id=${encodeURIComponent(userId)}`
+    })
+    .then(response => response.text())
+    .then(html => {
+        document.body.innerHTML = html; // Update the page with new HTML
+        bindLikeButtons(); // Re-bind event listeners to new Like buttons
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+</script>
+
+</body>
+</html>
